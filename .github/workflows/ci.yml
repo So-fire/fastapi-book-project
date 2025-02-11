@@ -3,7 +3,7 @@ name: CI Pipeline
 on:
   pull_request:
     branches:
-      - main  # Ensure this is correctly set to 'main'
+      - main  # Ensure this is correctly settt to 'main'
 
 jobs:
   test:
