@@ -9,39 +9,58 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Deploy via SSH
+      - name: Deploy with SSH
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.SSH_HOST }}  # Your EC2 Public IP (e.g., 54.174.250.231)
+          username: ${{ secrets.SSH_USERNAME }}  # Typically 'ubuntu' or 'ec2-user'
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  # Your private key stored as a GitHub secret
+          port: 22  # Default SSH port
           script: |
-            # Update package index and install dependencies
-            sudo apt-get update -y
-            sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-
-            # Add Docker's official GPG key
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-
-            # Install Docker
-            sudo apt-get update -y
-            sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-
-            # Add the SSH user to the Docker group
-            sudo usermod -aG docker ${{ secrets.SSH_USERNAME }}
-
-            # Install Docker Compose
-            sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
-
-            # Verify installations
-            docker --version
-            docker-compose --version
-
-            # Navigate to the project directory and deploy
-            cd /home/ubuntu/
-            git clone <your-github-repo>
-            cd fastapi-book-project/
-            git pull
+            echo "SSH connection successful"
+            # Add your deployment steps here, e.g.:
+            cd /home/${{ secrets.SSH_USERNAME }}/your-app-folder
+            git pull origin main
             docker-compose up -d --build
+
+
+
+
+
+
+      # - name: Deploy via SSH
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ secrets.SSH_HOST }}
+      #     username: ${{ secrets.SSH_USERNAME }}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     script: |
+      #       # Update package index and install dependencies
+      #       sudo apt-get update -y
+      #       sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+
+      #       # Add Docker's official GPG key
+      #       curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+      #       sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+      #       # Install Docker
+      #       sudo apt-get update -y
+      #       sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+      #       # Add the SSH user to the Docker group
+      #       sudo usermod -aG docker ${{ secrets.SSH_USERNAME }}
+
+      #       # Install Docker Compose..
+      #       sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      #       sudo chmod +x /usr/local/bin/docker-compose
+
+      #       # Verify installations
+      #       docker --version
+      #       docker-compose --version
+
+      #       # Navigate to the project directory and deploy
+      #       cd /home/ubuntu/
+      #       git clone <your-github-repo>
+      #       cd fastapi-book-project/
+      #       git pull
+      #       docker-compose up -d --build
